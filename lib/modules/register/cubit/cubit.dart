@@ -49,6 +49,8 @@ class SocialRegisterCubit extends Cubit<SocialRegisterStates> {
       email: email,
       phone: phone,
       uId: uId,
+      bio: 'Write your bio ...',
+      image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
       isEmailVerified: false,
     );
 
