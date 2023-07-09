@@ -50,6 +50,7 @@ class SocialRegisterCubit extends Cubit<SocialRegisterStates> {
       phone: phone,
       uId: uId,
       bio: 'Write your bio ...',
+      coverImage: 'https://www.seiu1000.org/sites/main/files/main-images/camera_lense_0.jpeg',
       image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
       isEmailVerified: false,
     );
