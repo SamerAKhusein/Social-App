@@ -2,6 +2,7 @@ abstract class SocialStates {}
 
 class SocialInitialState extends SocialStates {}
 
+// Get user
 class SocialGetUserLoadingState extends SocialStates {}
 
 class SocialGetUserSuccessState extends SocialStates {}
@@ -13,6 +14,7 @@ class SocialGetUserErrorState extends SocialStates
   SocialGetUserErrorState(this.error);
 }
 
+// get all users
 class SocialGetAllUsersLoadingState extends SocialStates {}
 
 class SocialGetAllUsersSuccessState extends SocialStates {}
@@ -24,45 +26,38 @@ class SocialGetAllUsersErrorState extends SocialStates
   SocialGetAllUsersErrorState(this.error);
 }
 
-class SocialGetPostsLoadingState extends SocialStates {}
-
-class SocialGetPostsSuccessState extends SocialStates {}
-
-class SocialGetPostsErrorState extends SocialStates
-{
-  final String error;
-
-  SocialGetPostsErrorState(this.error);
-}
-
-class SocialLikePostSuccessState extends SocialStates {}
-
-class SocialLikePostErrorState extends SocialStates
-{
-  final String error;
-
-  SocialLikePostErrorState(this.error);
-}
-
+// Change Bottom Nav
 class SocialChangeBottomNavState extends SocialStates {}
 
+// New Post
 class SocialNewPostState extends SocialStates {}
+
+// Profile Image Picked
 
 class SocialProfileImagePickedSuccessState extends SocialStates {}
 
 class SocialProfileImagePickedErrorState extends SocialStates {}
 
-class SocialCoverImagePickedSuccessState extends SocialStates {}
+// Upload Profile Image
 
-class SocialCoverImagePickedErrorState extends SocialStates {}
 
 class SocialUploadProfileImageSuccessState extends SocialStates {}
 
 class SocialUploadProfileImageErrorState extends SocialStates {}
 
+// CoverImagePicked
+
+class SocialCoverImagePickedSuccessState extends SocialStates {}
+
+class SocialCoverImagePickedErrorState extends SocialStates {}
+
+// Upload Cover Image
+
 class SocialUploadCoverImageSuccessState extends SocialStates {}
 
 class SocialUploadCoverImageErrorState extends SocialStates {}
+
+// User Update
 
 class SocialUserUpdateLoadingState extends SocialStates {}
 
@@ -77,11 +72,38 @@ class SocialCreatePostSuccessState extends SocialStates {}
 
 class SocialCreatePostErrorState extends SocialStates {}
 
+// Post Image Picked
+
 class SocialPostImagePickedSuccessState extends SocialStates {}
 
 class SocialPostImagePickedErrorState extends SocialStates {}
 
 class SocialRemovePostImageState extends SocialStates {}
+
+// Get Post
+
+class SocialGetPostsLoadingState extends SocialStates {}
+
+class SocialGetPostsSuccessState extends SocialStates {}
+
+class SocialGetPostsErrorState extends SocialStates
+{
+  final String error;
+
+  SocialGetPostsErrorState(this.error);
+}
+
+// like post
+
+class SocialLikePostSuccessState extends SocialStates {}
+
+class SocialLikePostErrorState extends SocialStates
+{
+  final String error;
+
+  SocialLikePostErrorState(this.error);
+}
+
 
 // chat
 
@@ -90,3 +112,5 @@ class SocialSendMessageSuccessState extends SocialStates {}
 class SocialSendMessageErrorState extends SocialStates {}
 
 class SocialGetMessagesSuccessState extends SocialStates {}
+
+class SocialGetMessagesErrorState extends SocialStates {}
