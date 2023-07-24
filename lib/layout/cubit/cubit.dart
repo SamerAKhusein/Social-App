@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:social/layout/cubit/states.dart';
 import 'package:social/models/message_model.dart';
 import 'package:social/models/post_model.dart';
@@ -12,8 +17,8 @@ import 'package:social/modules/new_post/new_post_screen.dart';
 import 'package:social/modules/settings/settings_screen.dart';
 import 'package:social/modules/users/users_screen.dart';
 import 'package:social/shared/components/constants.dart';
-import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter_sound/flutter_sound.dart';
 
 
 class SocialCubit extends Cubit<SocialStates> {
@@ -66,7 +71,7 @@ class SocialCubit extends Cubit<SocialStates> {
 
 
   void changeBottomNav(int index) {
-    if(index == 1)
+    if (index == 1)
       getAllUsers();
     if (index == 2)
       emit(SocialNewPostState());
@@ -240,8 +245,7 @@ class SocialCubit extends Cubit<SocialStates> {
     }
   }
 
-  void removePostImage()
-  {
+  void removePostImage() {
     postImage = null;
     emit(SocialRemovePostImageState());
   }
@@ -314,79 +318,70 @@ class SocialCubit extends Cubit<SocialStates> {
   List<String> postsId = [];
   List<int> likes = [];
 
-  void getPosts()
-  {
+  void getPosts() {
     FirebaseFirestore.instance
         .collection('posts')
         .get()
         .then((value) {
-          value.docs.forEach((element) {
-
-            element.reference
+      value.docs.forEach((element) {
+        element.reference
             .collection('Likes')
             .get()
             .then((value) {
-              likes.add(value.docs.length);
-              postsId.add(element.id);
-              posts.add(PostModel.fromJson(element.data()));
-            })
-            .catchError((onError){
-              print(onError.toString());
-            });
-
-          });
+          likes.add(value.docs.length);
+          postsId.add(element.id);
+          posts.add(PostModel.fromJson(element.data()));
+        })
+            .catchError((onError) {
+          print(onError.toString());
+        });
+      });
       emit(SocialGetPostsSuccessState());
-
     })
         .catchError((error) {
-          emit(SocialGetPostsErrorState(error.toString()));
+      emit(SocialGetPostsErrorState(error.toString()));
     });
   }
 
-  void likePost(String postId)
-  {
+  void likePost(String postId) {
     FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
         .collection('Likes')
         .doc(userModel?.uId)
         .set({
-      'like' : true,
+      'like': true,
     })
         .then((value) {
-          emit(SocialLikePostSuccessState());
-
-    }).catchError((onError){
+      emit(SocialLikePostSuccessState());
+    }).catchError((onError) {
       emit(SocialLikePostErrorState(onError.toString()));
     });
   }
 
-  // Get All Useers
+  // Get All Users
 
   List<UserModel> users = [];
 
-  void getAllUsers()
-  {
-    if(users.length == 0)
-      {
-        FirebaseFirestore.instance
-            .collection('users')
-            .get()
-            .then((value) {
-          value.docs.forEach((element) {
-            if(element.data()['uId'] != userModel!.uId)
-              {
-                users.add(UserModel.fromJson(element.data()));
-              }
-          });
-          emit(SocialGetAllUsersSuccessState());
-
-        })
-            .catchError((error) {
-          emit(SocialGetAllUsersErrorState(error.toString()));
+  void getAllUsers() {
+    if (users.isEmpty) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .get()
+          .then((value) {
+        value.docs.forEach((element) {
+          if (element.data()['uId'] != userModel!.uId) {
+            final newUser = UserModel.fromJson(element.data());
+            if (!users.contains(newUser)) {
+              users.add(newUser);
+            }
+          }
         });
-      }
-
+        emit(SocialGetAllUsersSuccessState());
+      }).catchError((error) {
+        emit(SocialGetAllUsersErrorState(error.toString()));
+      });
+    }
   }
 
   // Send Message
@@ -395,12 +390,18 @@ class SocialCubit extends Cubit<SocialStates> {
     required String receiverId,
     required String dateTime,
     required String text,
+    bool isVoiceMessage = false,
+    String? voiceUrl,
+    int? voiceDuration,
   }) {
     MessageModel model = MessageModel(
       text: text,
       senderId: userModel?.uId,
       receiverId: receiverId,
       dateTime: dateTime,
+      isVoiceMessage: isVoiceMessage,
+      fileUrl: voiceUrl,
+      voiceDuration: voiceDuration,
     );
 
     // set my chats
@@ -415,7 +416,7 @@ class SocialCubit extends Cubit<SocialStates> {
         .then((value) {
       emit(SocialSendMessageSuccessState());
     }).catchError((error) {
-      emit(SocialSendMessageErrorState());
+      emit(SocialSendMessageErrorState(error.toString()));
     });
 
     // set receiver chats
@@ -430,7 +431,7 @@ class SocialCubit extends Cubit<SocialStates> {
         .then((value) {
       emit(SocialSendMessageSuccessState());
     }).catchError((error) {
-      emit(SocialSendMessageErrorState());
+      emit(SocialSendMessageErrorState(error.toString()));
     });
   }
 
@@ -449,14 +450,120 @@ class SocialCubit extends Cubit<SocialStates> {
         .orderBy('dateTime')
         .snapshots()
         .listen((event) {
-          messages = [];
+      messages = [];
 
       event.docs.forEach((element) {
-        print(messages.length);
+
         messages.add(MessageModel.fromJson(element.data()));
       });
 
       emit(SocialGetMessagesSuccessState());
     });
   }
+
+
+  // // Voice Recording
+
+void startRecord()
+{
+  emit(SocialStartRecordingState());
+}
+
+void StopRecord()
+{
+  emit(SocialStopRecordingState());
+}
+void sendRecord()
+{
+  emit(SocialSendRecordingState());
+}
+
+  Timer? _timer;
+  int _seconds = 1;
+
+  void startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _seconds++;
+      emit(TimerRunningState(_seconds));
+    });
+  }
+  void resetTimer() {
+    _timer?.cancel();
+    _seconds = 1;
+    emit(TimerRunningState(_seconds));
+  }
+
+  @override
+  Future<void> close() {
+    _timer?.cancel();
+    return super.close();
+  }
+
+  Future<String?> uploadVoiceRecording(File voiceFile) async {
+    try {
+      String fileName = 'audio_${DateTime.now().millisecondsSinceEpoch}.aac';
+      final ref = firebase_storage.FirebaseStorage.instance.ref().child('voiceMessages/$fileName');
+
+      // Create a task to upload the file and track the progress
+      final uploadTask = ref.putFile(voiceFile);
+
+      // Wait for the upload to complete
+      await uploadTask;
+
+      // Get the download URL of the uploaded file
+      final url = await ref.getDownloadURL();
+
+      return url;
+    } catch (e) {
+      print('Error uploading voice recording: $e');
+      return null;
+    }
+  }
+
+void sendVoiceMessage({
+    required String receiverId,
+    required String dateTime,
+    required String fileUrl,
+  }) {
+    MessageModel model = MessageModel(
+      senderId: userModel?.uId,
+      receiverId: receiverId,
+      dateTime: dateTime,
+      fileUrl: fileUrl,
+    );
+
+    // set my chats
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userModel?.uId)
+        .collection('chats')
+        .doc(receiverId)
+        .collection('messages')
+        .add(model.toMap())
+        .then((value) {
+      emit(SocialSendMessageSuccessState());
+    }).catchError((error) {
+      emit(SocialSendMessageErrorState(error.toString()));
+    });
+
+    // set receiver chats
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(receiverId)
+        .collection('chats')
+        .doc(userModel?.uId)
+        .collection('messages')
+        .add(model.toMap())
+        .then((value) {
+      emit(SocialSendMessageSuccessState());
+    }).catchError((error) {
+      emit(SocialSendMessageErrorState(error.toString()));
+    });
+  }
+
+
+
 }

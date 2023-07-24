@@ -1,3 +1,5 @@
+import 'package:social/models/message_model.dart';
+
 abstract class SocialStates {}
 
 class SocialInitialState extends SocialStates {}
@@ -105,12 +107,35 @@ class SocialLikePostErrorState extends SocialStates
 }
 
 
-// chat
+// Send Message
 
 class SocialSendMessageSuccessState extends SocialStates {}
+class SocialSendMessageErrorState extends SocialStates
+{
+  final String error;
 
-class SocialSendMessageErrorState extends SocialStates {}
+  SocialSendMessageErrorState(this.error);
+}
+
+// Get Message
 
 class SocialGetMessagesSuccessState extends SocialStates {}
 
-class SocialGetMessagesErrorState extends SocialStates {}
+// Start Record
+
+class SocialStartRecordingState extends SocialStates {}
+
+// Stop Record
+
+class SocialStopRecordingState extends SocialStates {}
+
+// start Send Recording
+
+class SocialSendRecordingState extends SocialStates {}
+
+// start Timer
+
+class TimerRunningState extends SocialStates {
+  final int seconds;
+  TimerRunningState(this.seconds);
+}

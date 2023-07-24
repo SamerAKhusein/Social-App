@@ -48,6 +48,20 @@ dependencies:
   hexcolor: ^3.0.1
   image_picker: ^0.7.5+4
   firebase_storage: ^11.2.4
+  firebase_messaging: ^14.6.4
+  flutter_sound: ^9.2.13
+  permission_handler: ^10.4.3
+  path_provider: ^2.0.15
+  rxdart: ^0.27.7
+  flutter_animate: ^4.2.0
+
+
+
+
+
+
+#  audio_service: ^0.18.10
+#  audio_session: ^0.1.16
 
 
 

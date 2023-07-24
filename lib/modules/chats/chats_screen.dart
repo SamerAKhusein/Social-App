@@ -40,9 +40,7 @@ class ChatsScreen extends StatelessWidget
     return  InkWell(
       onTap: ()
       {
-        navigateTo(context, ChatDetailsScreen(
-          userModel: model,
-        ));
+        navigateTo(context, ChatDetailsScreen(userModel: model,));
       },
       child: Padding(
         padding: const EdgeInsets.all(20.0),

@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:social/firebase_options.dart';
 import 'package:social/layout/cubit/cubit.dart';
 import 'package:social/layout/social_layout_screen.dart';
@@ -22,6 +24,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  var token = await FirebaseMessaging.instance.getToken();
+  print(token);
+  FirebaseMessaging.onMessage.listen((event) {
+    print(event.data.toString());
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((event) {
+    print(event.data.toString());
+  });
   Bloc.observer = MyBlocObserver();
 
   await CacheHelper.init();
@@ -41,7 +51,6 @@ void main() async {
   {
     widget = SocialLoginScreen();
   }
-
   runApp(MyApp(
     // isDark: isDark,
     startWidget: widget,
